@@ -13,18 +13,18 @@ from ai_img_gen.types import (
 class TestTypes(unittest.TestCase):
     def test_client_config(self):
         # Test with required parameters only
-        config = ClientConfig(base_url="https://images.chargingev.app")
-        self.assertEqual(config.base_url, "https://images.chargingev.app")
+        config = ClientConfig(base_url="https://api.img-gen.ai")
+        self.assertEqual(config.base_url, "https://api.img-gen.ai")
         self.assertIsNone(config.api_key)
         self.assertEqual(config.timeout, 30)
 
         # Test with all parameters
         config = ClientConfig(
-            base_url="https://images.chargingev.app",
+            base_url="https://api.img-gen.ai",
             api_key="test_api_key",
             timeout=60
         )
-        self.assertEqual(config.base_url, "https://images.chargingev.app")
+        self.assertEqual(config.base_url, "https://api.img-gen.ai")
         self.assertEqual(config.api_key, "test_api_key")
         self.assertEqual(config.timeout, 60)
 

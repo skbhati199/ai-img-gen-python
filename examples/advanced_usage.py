@@ -12,7 +12,7 @@ import time
 # Initialize the client
 client = AIImageGeneratorClient(
     ClientConfig(
-        base_url="https://images.chargingev.app",
+        base_url="https://api.img-gen.ai",
         api_key=os.environ.get("AI_IMG_GEN_API_KEY", "your_api_key_here")
     )
 )

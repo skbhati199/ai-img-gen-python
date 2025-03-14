@@ -3,7 +3,7 @@ from ai_img_gen import AIImageGeneratorClient, ClientConfig, ImageGenerationOpti
 # Initialize the client
 client = AIImageGeneratorClient(
     ClientConfig(
-        base_url="https://images.chargingev.app",
+        base_url="https://api.img-gen.ai",
         api_key="your_api_key_here"
     )
 )

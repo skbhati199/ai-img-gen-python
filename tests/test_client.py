@@ -17,7 +17,7 @@ class TestAIImageGeneratorClient(unittest.TestCase):
     def setUp(self):
         self.client = AIImageGeneratorClient(
             ClientConfig(
-                base_url="https://images.chargingev.app",
+                base_url="https://api.img-gen.ai",
                 api_key="test_api_key"
             )
         )
@@ -27,7 +27,7 @@ class TestAIImageGeneratorClient(unittest.TestCase):
         # Setup mock response
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.url = "https://images.chargingev.app/images/test.png"
+        mock_response.url = "https://api.img-gen.ai/images/test.png"
         mock_request.return_value = mock_response
 
         # Test generate_image method
@@ -48,7 +48,7 @@ class TestAIImageGeneratorClient(unittest.TestCase):
         mock_request.assert_called_once()
         args, kwargs = mock_request.call_args
         self.assertEqual(kwargs['method'], 'GET')
-        self.assertEqual(kwargs['url'], 'https://images.chargingev.app/images/image-gen')
+        self.assertEqual(kwargs['url'], 'https://api.img-gen.ai/images/image-gen')
         self.assertEqual(kwargs['params']['width'], 512)
         self.assertEqual(kwargs['params']['height'], 512)
         self.assertEqual(kwargs['params']['prompt'], "Test prompt")
@@ -73,14 +73,14 @@ class TestAIImageGeneratorClient(unittest.TestCase):
         mock_request.assert_called_once()
         args, kwargs = mock_request.call_args
         self.assertEqual(kwargs['method'], 'GET')
-        self.assertEqual(kwargs['url'], 'https://images.chargingev.app/images/supported-models')
+        self.assertEqual(kwargs['url'], 'https://api.img-gen.ai/images/supported-models')
 
     @patch('ai_img_gen.client.requests.request')
     def test_resize_image(self, mock_request):
         # Setup mock response
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.url = "https://images.chargingev.app/images/resized.png"
+        mock_response.url = "https://api.img-gen.ai/images/resized.png"
         mock_request.return_value = mock_response
 
         # Test resize_image method
@@ -98,7 +98,7 @@ class TestAIImageGeneratorClient(unittest.TestCase):
         mock_request.assert_called_once()
         args, kwargs = mock_request.call_args
         self.assertEqual(kwargs['method'], 'GET')
-        self.assertEqual(kwargs['url'], 'https://images.chargingev.app/images/process/resize/test_image_id')
+        self.assertEqual(kwargs['url'], 'https://api.img-gen.ai/images/process/resize/test_image_id')
         self.assertEqual(kwargs['params']['width'], 256)
         self.assertEqual(kwargs['params']['height'], 256)
         self.assertEqual(kwargs['params']['format'], "png")
