@@ -4,3 +4,5 @@
 
 /ai_image_gen
 /ai_image_gen.egg-info
+
+/.pytest_cache
