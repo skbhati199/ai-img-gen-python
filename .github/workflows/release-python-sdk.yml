@@ -13,6 +13,11 @@ on:
         required: true
         default: 'patch'
 
+# Add global permissions
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -125,7 +130,11 @@ jobs:
     needs: publish-pypi
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
-
+    
+    # Add explicit permissions for this job
+    permissions:
+      contents: write
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
