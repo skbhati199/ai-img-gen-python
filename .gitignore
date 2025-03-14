@@ -2,7 +2,7 @@
 
 .env
 
-/ai_img_gen
-/ai_img_gen.egg-info
+/ai_img_gen/
+/ai_img_gen.egg-info/
 
 /.pytest_cache
