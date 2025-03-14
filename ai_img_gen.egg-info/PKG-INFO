@@ -1,8 +1,8 @@
 Metadata-Version: 2.2
-Name: ai-img-gen
+Name: ai-img-gen-python
 Version: 0.1.0
 Summary: Python SDK for AI Image Generator API
-Home-page: https://github.com/skbhati199/ai-img-gen
+Home-page: https://github.com/skbhati199/ai-img-gen-python
 Author: skbhati199
 Author-email: skbhati199@gmail.com
 Classifier: Programming Language :: Python :: 3
@@ -27,16 +27,16 @@ Dynamic: summary
 
 # AI Image Generator Python SDK
 
-[![PyPI version](https://img.shields.io/pypi/v/ai-img-gen.svg)](https://pypi.org/project/ai-img-gen/)
+[![PyPI version](https://img.shields.io/pypi/v/ai-img-gen-python.svg)](https://pypi.org/project/ai-img-gen-python/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python Versions](https://img.shields.io/pypi/pyversions/ai-img-gen.svg)](https://pypi.org/project/ai-img-gen/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/ai-img-gen-python.svg)](https://pypi.org/project/ai-img-gen-python/)
 
 A Python SDK for interacting with the AI Image Generator API.
 
 ## Installation
 
 ```bash
-pip install ai-img-gen
+pip install ai-img-gen-python
 ```
 
 

@@ -147,7 +147,7 @@ jobs:
             
             ## Installation
             ```
-            pip install ai-img-gen==${{ steps.get_version.outputs.VERSION }}
+            pip install ai-img-gen-python==${{ steps.get_version.outputs.VERSION }}
             ```
           files: |
             dist/*
