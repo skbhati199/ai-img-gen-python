@@ -1,0 +1,157 @@
+name: Release Python SDK
+
+on:
+  push:
+    tags:
+      - 'python-sdk-v*'
+    paths:
+      - 'sdk/python/**'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (patch, minor, major, or specific version)'
+        required: true
+        default: 'patch'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+          cache-dependency-path: './requirements.txt'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+
+      - name: Run tests
+        run: pytest tests/
+
+      - name: Build package
+        run: python -m build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-build-artifacts
+          path: dist/
+
+  publish-pypi:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-build-artifacts
+          path: dist
+
+      - name: Version and publish (from tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/python-sdk-v}
+          sed -i "s/version=\"[0-9]*\.[0-9]*\.[0-9]*\"/version=\"$VERSION\"/g" setup.py
+          python -m twine upload dist/*
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+
+      - name: Version and publish (manual)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if [[ "${{ github.event.inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            CURRENT_VERSION=$(grep -oP 'version="\K[0-9]+\.[0-9]+\.[0-9]+' setup.py)
+            if [ "${{ github.event.inputs.version }}" == "patch" ]; then
+              VERSION=$(echo $CURRENT_VERSION | awk -F. '{$NF = $NF + 1;} 1' OFS=.)
+            elif [ "${{ github.event.inputs.version }}" == "minor" ]; then
+              VERSION=$(echo $CURRENT_VERSION | awk -F. '{$(NF-1) = $(NF-1) + 1; $NF = 0;} 1' OFS=.)
+            elif [ "${{ github.event.inputs.version }}" == "major" ]; then
+              VERSION=$(echo $CURRENT_VERSION | awk -F. '{$1 = $1 + 1; $(NF-1) = 0; $NF = 0;} 1' OFS=.)
+            else
+              VERSION=$CURRENT_VERSION
+            fi
+          fi
+          sed -i "s/version=\"[0-9]*\.[0-9]*\.[0-9]*\"/version=\"$VERSION\"/g" setup.py
+          python -m twine upload dist/*
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+
+  create-github-release:
+    needs: publish-pypi
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/python-sdk-v}" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        id: changelog
+        uses: mikepenz/release-changelog-builder-action@v4
+        with:
+          configuration: ".github/changelog-config.json"
+          commitMode: true
+          toTag: ${{ github.ref }}
+          fetchReleaseInformation: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Python SDK v${{ steps.get_version.outputs.VERSION }}
+          body: |
+            # Python SDK Release v${{ steps.get_version.outputs.VERSION }}
+            
+            ## Changes
+            ${{ steps.changelog.outputs.changelog }}
+            
+            ## Installation
+            ```
+            pip install ai-img-gen==${{ steps.get_version.outputs.VERSION }}
+            ```
+          files: |
+            dist/*
+            README.md
+            LICENSE
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
